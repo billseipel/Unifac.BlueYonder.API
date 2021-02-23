@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4" style="text-align:center;">Reports</h1>
+
+    <div id="ReportLinksContainer">
+        <table style="border:black 1px solid; width:100%;" cellpadding="0" cellspacing="0">
+            <tr>
+                <td colspan="3" style="border:black 1px solid;"> All Available Reports</td>
+            </tr>
+            <tr>
+                <td><a asp-controller="Users" asp-action="Index">List All Users</a></td>
+                @*<td><a asp-controller="BillofLading" asp-action="Index">Bill of Lading</a></td>*@
+                <td><a asp-controller="Orders" asp-action="Index">Orders</a></td>
+                <td><a asp-controller="Shipments" asp-action="Index">Shipments</a></td>
+            </tr>
+            @*<tr>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+        </tr>
+        <tr>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+            <td><a asp-controller=" " asp-action="Index">New Report Here*</a></td>
+        </tr>*@
+        </table>
+    </div>
+    @*<div id="grid"></div>
+    <script>
+        $(document).ready(function () {
+            $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "http://localhost:61124/api/Users",
+                            type: "POST",
+                            dataType: "json",
+                        }
+                    }
+                },
+                resizable: true,
+                columns: [
+                    {
+                        field: "usr_dsp",
+                        title: "User DSP",
+                    },
+                    {
+                        field: "last_name",
+                        title: "Last Name"
+                    }
+                ],
+                filterable: true,
+                //have to manually specify column widths...
+                //https://www.telerik.com/forums/autofitcolumn-truncating-headings
+                //AutoFitColumn truncating headings
+                //http://dojo.telerik.com/OYEqa/7
+                resizable: true,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                toolbar: ["excel"],
+                excel: {
+                    fileName: "Inactive Items Report.xlsx"
+                },
+            });
+        });
+    </script>*@
+  
+</div>
+
+
+
+

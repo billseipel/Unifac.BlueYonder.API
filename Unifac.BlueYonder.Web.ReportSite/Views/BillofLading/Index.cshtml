@@ -1,0 +1,104 @@
+﻿@model Unifac.BlueYonder.Web.ReportSite.Models.BillofLading.BillofLadingModel
+
+@{
+    ViewData["Title"] = "Bill of Lading";
+}
+@{
+
+
+    @*@using (Html.BeginForm("GetByOrderNumber", "BillofLading", FormMethod.Post))
+    {
+        @Html.TextBoxFor(model => model.billofladingID)
+        @Html.ValidationMessageFor(model => model.billofladingID)
+        
+        <button type="submit">Lookup by Order Number</button>
+    }*@
+    <input id="txtOrderNumber" type="text" />
+    <button id="btnDataSource" type="submit" onclick="changeDataSource(document.getElementById('txtOrderNumber').value)">Lookup by Order Number</button>
+    <div id="grid"></div>
+    <script>
+
+        function changeDataSource(url) {
+            var newds = "http://localhost:61124/api/BillofLading/" + url;
+            var dataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: newds,
+                        type: "GET",
+                        dataType: "json",
+                    }
+                }
+            });
+            var grid = $("#grid").data("kendoGrid");
+            grid.setDataSource(dataSource);
+        }
+
+
+
+        $(document).ready(function () {
+            $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "http://localhost:61124/api/BillofLading",
+                            type: "GET",
+                            dataType: "json",
+                        }
+                    }
+                },
+                resizable: true,
+                columns: [
+                    {
+                        field: "wh_id",
+                        title: "Warehouse ID",
+                    },
+                    {
+                        field: "host_client_id",
+                        title: "Host ID",
+                    },
+                    {
+                        field: "trlr_num",
+                        title: "Trailer Num",
+                    },
+                    {
+                        field: "trlr_id",
+                        title: "Trailer ID",
+                    },
+                    {
+                        field: "close_dt",
+                        title: "ADR ID"
+                    }
+                    //},
+                    //{
+                    //    field: "lst_dat",
+                    //    title: "Last Date",
+                    //},
+                    //{
+                    //    field: "lst_logout_dte",
+                    //    title: "Last Logout Date",
+                    //},
+                    //{
+                    //    field: "usr_dsp",
+                    //    title: "User DSP",
+                    //}
+                ],
+                filterable: true,
+                //have to manually specify column widths...
+                //https://www.telerik.com/forums/autofitcolumn-truncating-headings
+                //AutoFitColumn truncating headings
+                //http://dojo.telerik.com/OYEqa/7
+
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                toolbar: ["excel"],
+                excel: {
+                    fileName: "Inactive Items Report.xlsx"
+                },
+            });
+        });
+    </script>
+
+}

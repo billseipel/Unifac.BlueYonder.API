@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Users";
+
+}
+@{
+    <div id="grid"></div>
+    <script>
+        $(document).ready(function () {
+            $("#grid").kendoGrid({
+                dataSource: {
+                    type: "json",
+                    transport: {
+                        read: {
+                            url: "http://localhost:61124/api/users",
+                            type: "GET",
+                            dataType: "json",
+                        }
+                    }
+                },
+                resizable: true,
+                columns: [
+                    {
+                        field: "firstname",
+                        title: "First Name",
+                    },
+                    {
+                        field: "lastname",
+                        title: "Last Name",
+                    },
+                    {
+                        field: "userId",
+                        title: "User ID",
+                    },
+                    {
+                        field: "loginId",
+                        title: "Login ID",
+                    },
+                    {
+                        field: "adrId",
+                        title: "ADR ID",
+                    },
+                    {
+                        field: "lstDate",
+                        title: "Last Date",
+                    },
+                    {
+                        field: "lastLogoutDate",
+                        title: "Last Logout Date",
+                    },
+                    {
+                        field: "userDsp",
+                        title: "User DSP",
+                    }
+                ],
+                filterable: true,
+                //have to manually specify column widths...
+                //https://www.telerik.com/forums/autofitcolumn-truncating-headings
+                //AutoFitColumn truncating headings
+                //http://dojo.telerik.com/OYEqa/7
+                resizable: true,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: true
+                },
+                toolbar: ["excel"],
+                excel: {
+                    fileName: "Inactive Items Report.xlsx"
+                },
+            });
+        });
+    </script>
+
+}

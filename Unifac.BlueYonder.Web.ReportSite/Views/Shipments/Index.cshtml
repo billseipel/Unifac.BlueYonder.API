@@ -1,0 +1,329 @@
+﻿@*@model Unifac.BlueYonder.Web.ReportSite.Models.Shipments.ShipmentsModel*@
+
+<style>
+    .k-detail-cell .k-tabstrip .k-content {
+        padding: 0.2em;
+    }
+
+    .shipment-details ul {
+        list-style: none;
+        font-style: italic;
+        margin: 15px;
+        padding: 0;
+    }
+
+        .shipment-details ul li {
+            margin: 0;
+            line-height: 1.7em;
+        }
+
+    .shipment-details label {
+        display: inline-block;
+        width: 90px;
+        padding-right: 10px;
+        text-align: right;
+        font-style: normal;
+        font-weight: bold;
+    }
+</style>
+
+
+<table>
+    <tr>
+        <td><label>Trailer Number</label></td>
+        <td><input id="txtTrailerNumber" type="text" /></td>
+        <td><label>Order Number</label></td>
+        <td>
+            <input id="txtOrderNumber" type="text" />
+        </td>
+    </tr>
+    @*<tr>
+       
+    </tr>*@
+    <tr>
+        <td>
+            <label>Document Number</label>
+        </td>
+        <td>
+            <input id="txtdocumentNumber" type="text" />
+        </td>
+        <td>
+            <label>Dispatch Date</label>
+        </td>
+        <td>
+            <input id="txtdispatchDate" type="text" />
+        </td>
+        <td>
+            <label>Shipment Id</label>
+        </td>
+        <td>
+            <input id="txtshipmentId" type="text" />
+        </td>
+    </tr>
+    @*<tr>
+        
+    </tr>
+    <tr>
+       
+    </tr>*@
+    <tr>
+        <td>
+            <label>Begin Dispatch Date</label>
+        </td>
+        <td>
+            <input id="txtbegindispatchDate" type="text" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label>End Dispatch Date</label>
+        </td>
+        <td>
+            <input id="txtenddispatchDate" type="text" />
+        </td>
+    </tr>
+</table>
+
+
+
+
+<button id="btnDataSource" type="submit"
+        onclick="changeDataSource(document.getElementById('txtTrailerNumber').value
+    , document.getElementById('txtOrderNumber').value
+    , document.getElementById('txtdocumentNumber').value
+    , document.getElementById('txtdispatchDate').value
+    , document.getElementById('txtshipmentId').value
+    , document.getElementById('txtbegindispatchDate').value
+    , document.getElementById('txtenddispatchDate').value)">
+    Search
+</button>
+
+<div id="grid"></div>
+
+<script type="text/x-kendo-template" id="template">
+    <div class="detailTabstrip">
+        <ul>
+            <li class="k-state-active">
+                Shipment Line Detail
+            </li>
+            @*<li><label>Line :</label>#= shipmentLines #</li>*@
+
+        </ul>
+        <div>
+            <div class="shipmentLinesDetail"></div>
+        </div>
+        <div>
+            <div class='shipment-details'>
+                <ul>
+                    @*<li><label>City:</label>#= shipmentLines.line #</li> *@
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+
+    // set the default view to be a specific trailer number
+    $(document).ready(function () {
+
+        $("#grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "http://localhost:61124/api/shipments",
+                        type: "GET",
+                        dataType: "json"
+                    }
+                },
+                pageSize: 5,
+                serverPaging: true,
+                serverFiltering: true,
+                serverSorting: true
+                
+               
+            },
+            pageable: {
+                refresh: true,
+                pageSizes: 5,
+
+            },
+            detailTemplate: kendo.template($("#template").html()),
+            detailInit: detailInit,
+            dataBound: function () {
+                this.expandRow(this.tbody.find("tr.k-master-row").first());
+            },
+            resizable: true,
+            columns: [
+                {
+                    field: "shipId",
+                    title: "Shipment ID",
+                },
+                {
+                    field: "orderNumber",
+                    title: "Order Number",
+                },
+                {
+                    field: "shipStatus",
+                    title: "Ship Status",
+                },
+                {
+                    field: "hostExtId",
+                    title: "Host Ext Id",
+                },
+                {
+                    field: "carrierCode",
+                    title: "Carrier Code",
+                },
+                {
+                    field: "docNum",
+                    title: "Doc Num",
+                },
+                {
+                    field: "addDate",
+                    title: "Add Date",
+                },
+               
+                
+            ],
+            filterable: true,
+            //have to manually specify column widths...
+            //https://www.telerik.com/forums/autofitcolumn-truncating-headings
+            //AutoFitColumn truncating headings
+            //http://dojo.telerik.com/OYEqa/7
+
+            sortable: {
+                mode: "single",
+                allowUnsort: true
+            },
+            toolbar: ["excel"],
+            excel: {
+                fileName: "Inactive Items Report.xlsx"
+            },
+        });
+    });
+
+    function detailInit(e) {
+        var detailRow = e.detailRow;
+
+        detailRow.find(".detailTabstrip").kendoTabStrip({
+            animation: {
+                open: { effects: "fadeIn" }
+            }
+        });
+        var ordnum = e.data.orderNumber;
+        var url = "http://localhost:61124/api/shipments/orderdetail/" + ordnum; 
+        detailRow.find(".shipmentLinesDetail").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: url,
+                    type: "GET",
+                    dataType: "json"
+                },
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+                pageSize: 5
+                //,filter: { field: "orderNumber", operator: "eq", value: e.data.orderNumber }
+                
+            },
+            scrollable: false,
+            sortable: true,
+            pageable: true,
+            columns: [
+                
+                { field: "line", title: "Line", width: "110px" },
+                { field: "shipmentLineId", title: "Shipment Line ID", width: "110px" },
+                { field: "partNumber", title: "Part No.", width: "110px" },
+                { field: "orderQuantity", title: "Order Qty", width: "110px" },
+                { field: "pickQuantity", title: "Pick Qty", width: "110px" }
+            ]
+        });
+    }
+
+    /* trailer number required, ordernumber, documentnumber, dispatchdate */
+    function changeDataSource(trailerNumber
+        , orderNumber
+        , documentNumber
+        , dispatchDate
+        , shipmentId
+        , begindispatchDate
+        , enddispatchDate) {
+
+        var queryparams = "";
+
+        if (trailerNumber != "") {
+            if (queryparams != "")
+                queryparams = queryparams + trailerNumber;
+            else
+                queryparams = queryparams + "?trailerNumber=" + trailerNumber;
+        }
+        //else {
+        //    document.getElementById('txtTrailerNumber').value = "Trailer Number Required";
+        //    return 0;
+        //}
+
+        if (orderNumber != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&orderNumber=" + orderNumber;
+            else
+                queryparams = queryparams + "?orderNumber=" + orderNumber;
+
+        }
+        if (documentNumber != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&documentNumber=" + documentNumber;
+            else
+                queryparams = queryparams + "?documentNumber=" + documentNumber;
+
+        }
+        if (dispatchDate != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&dispatchDate=" + encodeURIComponent(dispatchDate);
+            else
+                queryparams = queryparams + "?dispatchDate=" + encodeURIComponent(dispatchDate);
+
+        }
+        if (orderNumber != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&orderNumber=" + orderNumber;
+            else
+                queryparams = queryparams + "?orderNumber=" + orderNumber;
+
+        }
+        if (shipmentId != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&shipmentId=" + shipmentId;
+            else
+                queryparams = queryparams + "?shipmentId=" + shipmentId;
+
+        }
+        if (begindispatchDate != "" & enddispatchDate != "") {
+            if (queryparams != "")
+                queryparams = queryparams + "&begindispatchDate=" + encodeURIComponent(begindispatchDate) + "&enddispatchDate=" + encodeURIComponent(enddispatchDate);
+            else
+                queryparams = queryparams + "?" + "&begindispatchDate=" + encodeURIComponent(begindispatchDate) + "&enddispatchDate=" + encodeURIComponent(enddispatchDate);
+
+        }
+
+
+
+        var newds = "http://localhost:61124/api/shipments" + queryparams;
+        var dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: newds,
+                    type: "GET",
+                    dataType: "json"
+                }
+                ,
+            }
+        });
+        var grid = $("#grid").data("kendoGrid");
+        grid.setDataSource(dataSource);
+    }
+
+</script>
